@@ -56,7 +56,7 @@ class _SupportScreenState extends State<SupportScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(color: Colors.amber.withOpacity(0.2),
+            decoration: BoxDecoration(color: Colors.amber.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12)),
             child: Text(_thanks!, textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
@@ -68,7 +68,7 @@ class _SupportScreenState extends State<SupportScreen> {
         ElevatedButton.icon(
           icon: const Icon(Icons.share),
           label: const Text('Share this game'),
-          onPressed: () => Share.share('Check out ${c.displayName}! ${c.tagline}'),
+          onPressed: () => SharePlus.instance.share(ShareParams(text: 'Check out ${c.displayName}! ${c.tagline}')),
         ),
         TextButton(
           onPressed: () => InAppReview.instance.openStoreListing(),

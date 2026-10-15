@@ -157,11 +157,19 @@ class ArcadeEngine extends ChangeNotifier {
     if (invuln > 0) invuln--;
     if (coolT > 0) coolT -= dt;
     if (flipT > 0) { flipT -= dt; if (flipT <= 0) flipSide = 0; }
-    for (final f in fx) f.t += dt;
+    for (final f in fx) {
+      f.t += dt;
+    }
     fx.removeWhere((f) => f.t > 0.4);
-    for (final b in obs) b.t += dt;
-    for (final b in cols) b.t += dt;
-    for (final b in misc) b.t += dt;
+    for (final b in obs) {
+      b.t += dt;
+    }
+    for (final b in cols) {
+      b.t += dt;
+    }
+    for (final b in misc) {
+      b.t += dt;
+    }
     switch (cfg.mode) {
       case ArcadeMode.dodge: _tickDodge(dt); break;
       case ArcadeMode.jump: _tickJump(dt); break;
@@ -264,8 +272,12 @@ class ArcadeEngine extends ChangeNotifier {
           cols.add(ArcBody(x: gapX, y: 1.06, kind: 1, r: 0.028, vy: -0.22 * speed));
         }
       }
-      for (final m in misc) m.y += m.vy * dt;
-      for (final c in cols) c.y += c.vy * dt;
+      for (final m in misc) {
+        m.y += m.vy * dt;
+      }
+      for (final c in cols) {
+        c.y += c.vy * dt;
+      }
       misc.removeWhere((m) => m.y < -0.08);
       cols.removeWhere((c) => c.y < -0.08);
       for (final m in misc) {
@@ -297,8 +309,12 @@ class ArcadeEngine extends ChangeNotifier {
     if (py < 0.45) {
       final dy = 0.45 - py;
       py = 0.45;
-      for (final p in misc) p.y += dy;
-      for (final c in cols) c.y += dy;
+      for (final p in misc) {
+        p.y += dy;
+      }
+      for (final c in cols) {
+        c.y += dy;
+      }
       score += (dy * 60).round();
     }
     // recycle platforms, spawn above
@@ -351,7 +367,9 @@ class ArcadeEngine extends ChangeNotifier {
       cols.add(ArcBody(x: 0.06 + _r.nextDouble() * 0.88, y: -0.05, kind: kind,
           vy: (kind == 4 ? 0.42 : 0.3 + _r.nextDouble() * 0.14) * sp, r: 0.032));
     }
-    for (final c in cols) c.y += c.vy * dt;
+    for (final c in cols) {
+      c.y += c.vy * dt;
+    }
     for (final c in List<ArcBody>.from(cols)) {
       if (c.y > 1.1) {
         if (c.kind == 1) { combo = 0; } // missed a good one
@@ -440,8 +458,12 @@ class ArcadeEngine extends ChangeNotifier {
         cols.add(ArcBody(x: 1.06, y: onFloor ? 0.6 : 0.4, kind: 1, vx: -0.42 * sp, r: 0.03));
       }
     }
-    for (final o in obs) o.x += o.vx * dt;
-    for (final c in cols) c.x += c.vx * dt;
+    for (final o in obs) {
+      o.x += o.vx * dt;
+    }
+    for (final c in cols) {
+      c.x += c.vx * dt;
+    }
     obs.removeWhere((o) => o.x < -0.08);
     cols.removeWhere((c) => c.x < -0.08);
     for (final o in List<ArcBody>.from(obs)) {
@@ -572,8 +594,12 @@ class ArcadeEngine extends ChangeNotifier {
         cols.add(ArcBody(x: 1.12, y: gapY, kind: 1, vx: -0.4 * sp, r: 0.028));
       }
     }
-    for (final o in obs) o.x += o.vx * dt;
-    for (final c in cols) c.x += c.vx * dt;
+    for (final o in obs) {
+      o.x += o.vx * dt;
+    }
+    for (final c in cols) {
+      c.x += c.vx * dt;
+    }
     obs.removeWhere((o) => o.x < -0.1);
     cols.removeWhere((c) => c.x < -0.1);
     for (final o in List<ArcBody>.from(obs)) {
@@ -721,7 +747,11 @@ class ArcadeEngine extends ChangeNotifier {
       final bonus = max(0, 120 - mazeTime.round() * 2);
       score += 100 + bonus * level;
       _scoredThisLevel += 6;
-      if (_scoredThisLevel >= 12) _levelUp(); else _scoredThisLevel = _scoredThisLevel;
+      if (_scoredThisLevel >= 12) {
+        _levelUp();
+      } else {
+        _scoredThisLevel = _scoredThisLevel;
+      }
       fx.add(ArcFX(goalX, goalY, kind: 1));
       onLevelUp?.call();
       _buildMaze();
@@ -800,7 +830,9 @@ class ArcadeEngine extends ChangeNotifier {
       misc.add(ArcBody(x: 0.2 + lane * 0.3, y: -0.05, kind: 5, vy: 0.55 * sp, r: 0.045, a: lane.toDouble()));
       rhythmBeat++;
     }
-    for (final n in misc) n.y += n.vy * dt;
+    for (final n in misc) {
+      n.y += n.vy * dt;
+    }
     for (final n in List<ArcBody>.from(misc)) {
       if (n.y > 1.05) {
         misc.remove(n);
@@ -905,8 +937,11 @@ class ArcadeEngine extends ChangeNotifier {
         jumpTap();
         break;
       case ArcadeMode.breakout:
-        if (ballHeld) launchBall();
-        else px = x.clamp(0.12, 0.88);
+        if (ballHeld) {
+          launchBall();
+        } else {
+          px = x.clamp(0.12, 0.88);
+        }
         break;
       case ArcadeMode.flip:
         flipGravity();

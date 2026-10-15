@@ -98,7 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             margin: const EdgeInsets.symmetric(horizontal: 3),
             padding: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
-              color: shapeIdx == i ? c.accentColor.withOpacity(0.35) : Colors.white10,
+              color: shapeIdx == i ? c.accentColor.withValues(alpha: 0.35) : Colors.white10,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: shapeIdx == i ? c.accentColor : Colors.transparent, width: 2)),
             child: Center(child: Text(arcShapes[i],
@@ -127,5 +127,5 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _toggle(String label, bool value, ValueChanged<bool> onChanged) => SwitchListTile(
     title: Text(label, style: const TextStyle(color: Colors.white)),
-    value: value, onChanged: onChanged, activeColor: widget.config.accentColor);
+    value: value, onChanged: onChanged, activeThumbColor: widget.config.accentColor);
 }

@@ -69,7 +69,7 @@ class _GameScreenState extends State<GameScreen> {
       ),
       body: AnimatedBuilder(
         animation: widget.engine,
-        builder: (_, __) {
+        builder: (_, _) {
           final e = widget.engine;
           if (e.gameOver) return _gameOver(c, e);
           return Column(children: [
@@ -83,7 +83,7 @@ class _GameScreenState extends State<GameScreen> {
 
   Widget _hud(ArcadeConfig c, ArcadeEngine e) {
     return Container(
-      color: c.primaryColor.withOpacity(0.25),
+      color: c.primaryColor.withValues(alpha: 0.25),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
         _stat('SCORE', '${e.score}'),
@@ -103,8 +103,11 @@ class _GameScreenState extends State<GameScreen> {
     return GestureDetector(
       onTapDown: (d) {
         final xy = _norm(d.globalPosition);
-        if (c.mode == ArcadeMode.glide) e.onHoldStart();
-        else e.onTap(xy[0], xy[1]);
+        if (c.mode == ArcadeMode.glide) {
+          e.onHoldStart();
+        } else {
+          e.onTap(xy[0], xy[1]);
+        }
       },
       onTapUp: (_) { if (c.mode == ArcadeMode.glide) e.onHoldEnd(); },
       onTapCancel: () { if (c.mode == ArcadeMode.glide) e.onHoldEnd(); },
@@ -156,7 +159,7 @@ class _ArcadePainter extends CustomPainter {
   void _emoji(Canvas cv, String em, double x, double y, double pxSize, Size size, {double opacity = 1}) {
     final tp = TextPainter(textDirection: TextDirection.ltr);
     tp.text = TextSpan(text: em,
-        style: TextStyle(fontSize: pxSize, color: Colors.white.withOpacity(opacity)));
+        style: TextStyle(fontSize: pxSize, color: Colors.white.withValues(alpha: opacity)));
     tp.layout();
     tp.paint(cv, Offset(x * size.width - tp.width / 2, y * size.height - tp.height / 2));
   }
@@ -165,14 +168,14 @@ class _ArcadePainter extends CustomPainter {
     cv.drawOval(
       Rect.fromCenter(center: Offset(x * size.width, (y + r * 0.9) * size.height),
           width: r * 2.4 * size.width, height: r * 0.5 * size.width),
-      Paint()..color = Colors.black.withOpacity(0.3));
+      Paint()..color = Colors.black.withValues(alpha: 0.3));
   }
 
   void _badge(Canvas cv, double x, double y, double r, Size size) {
     final cx = x * size.width, cy = y * size.height;
     final pr = r * size.width;
-    final paint = Paint()..color = config.accentColor.withOpacity(0.9);
-    final dark = Paint()..color = Colors.black.withOpacity(0.25);
+    final paint = Paint()..color = config.accentColor.withValues(alpha: 0.9);
+    final dark = Paint()..color = Colors.black.withValues(alpha: 0.25);
     cv.drawCircle(Offset(cx + 2, cy + 3), pr, dark);
     switch (shape % 6) {
       case 0: cv.drawCircle(Offset(cx, cy), pr, paint); break;
@@ -194,7 +197,11 @@ class _ArcadePainter extends CustomPainter {
       final ang = -1.5708 + i * 0.6283;
       final rr = i.isEven ? r : r * 0.45;
       final pt = Offset(c.dx + rr * cos(ang), c.dy + rr * sin(ang));
-      if (i == 0) path.moveTo(pt.dx, pt.dy); else path.lineTo(pt.dx, pt.dy);
+      if (i == 0) {
+        path.moveTo(pt.dx, pt.dy);
+      } else {
+        path.lineTo(pt.dx, pt.dy);
+      }
     }
     path.close();
     cv.drawPath(path, p);
@@ -205,7 +212,7 @@ class _ArcadePainter extends CustomPainter {
     final e = engine;
     final tp = TextPainter(textDirection: TextDirection.ltr);
     tp.text = TextSpan(text: config.bgEmoji,
-        style: TextStyle(fontSize: 26, color: Colors.white.withOpacity(0.07)));
+        style: TextStyle(fontSize: 26, color: Colors.white.withValues(alpha: 0.07)));
     tp.layout();
     for (int i = 0; i < 10; i++) {
       tp.paint(canvas, Offset((i * 113) % size.width, (i * 67) % size.height));
@@ -228,7 +235,7 @@ class _ArcadePainter extends CustomPainter {
     for (final f in e.fx) {
       final a = 1 - f.t / 0.4;
       canvas.drawCircle(Offset(f.x * size.width, f.y * size.height), 26 * a + 8,
-          Paint()..color = (f.kind == 1 ? Colors.red : config.accentColor).withOpacity(a * 0.7));
+          Paint()..color = (f.kind == 1 ? Colors.red : config.accentColor).withValues(alpha: a * 0.7));
     }
     if (e.paused) {
       tp.text = const TextSpan(text: '⏸ PAUSED', style: TextStyle(fontSize: 34, color: Colors.white));
@@ -238,7 +245,7 @@ class _ArcadePainter extends CustomPainter {
     if (e.invuln > 0 && e.invuln % 12 < 6) {
       canvas.drawCircle(Offset(e.px * size.width, e.py * size.height),
           (e.pr + 0.03) * size.width,
-          Paint()..color = Colors.white.withOpacity(0.35)
+          Paint()..color = Colors.white.withValues(alpha: 0.35)
             ..style = PaintingStyle.stroke..strokeWidth = 3);
     }
   }
@@ -255,14 +262,16 @@ class _ArcadePainter extends CustomPainter {
       _shadow(cv, o.x, o.y, o.r, size);
       _emoji(cv, config.obstacleEmoji, o.x, o.y, o.r * size.width * 1.7, size);
     }
-    for (final c in e.cols) _emoji(cv, config.collectEmoji, c.x, c.y, c.r * size.width * 1.6, size);
+    for (final c in e.cols) {
+      _emoji(cv, config.collectEmoji, c.x, c.y, c.r * size.width * 1.6, size);
+    }
     _player(cv, e, size, e.px, e.py, e.pr);
   }
 
   void _paintJump(Canvas cv, Size size) {
     final e = engine;
     final platPaint = Paint()..color = config.primaryColor;
-    final platDark = Paint()..color = Colors.black.withOpacity(0.3);
+    final platDark = Paint()..color = Colors.black.withValues(alpha: 0.3);
     for (final p in e.misc) {
       if (config.fallDown) {
         final gapL = p.a * size.width, gapR = p.t * size.width;
@@ -277,7 +286,9 @@ class _ArcadePainter extends CustomPainter {
         cv.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(7)), platPaint);
       }
     }
-    for (final c in e.cols) _emoji(cv, config.collectEmoji, c.x, c.y, c.r * size.width * 1.6, size);
+    for (final c in e.cols) {
+      _emoji(cv, config.collectEmoji, c.x, c.y, c.r * size.width * 1.6, size);
+    }
     _player(cv, e, size, e.px, e.py, e.pr);
   }
 
@@ -301,7 +312,7 @@ class _ArcadePainter extends CustomPainter {
       cv.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(6)),
           Paint()..color = col);
       cv.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(6)),
-          Paint()..color = Colors.white.withOpacity(0.15)..style = PaintingStyle.stroke..strokeWidth = 2);
+          Paint()..color = Colors.white.withValues(alpha: 0.15)..style = PaintingStyle.stroke..strokeWidth = 2);
     }
     final pw = 0.24 * size.width;
     cv.drawRRect(RRect.fromRectAndRadius(
@@ -316,11 +327,15 @@ class _ArcadePainter extends CustomPainter {
   void _paintFlip(Canvas cv, Size size) {
     final e = engine;
     cv.drawRect(Rect.fromLTWH(0, 0.9 * size.height, size.width, size.height * 0.1),
-        Paint()..color = config.primaryColor.withOpacity(0.5));
+        Paint()..color = config.primaryColor.withValues(alpha: 0.5));
     cv.drawRect(Rect.fromLTWH(0, 0, size.width, size.height * 0.1),
-        Paint()..color = config.primaryColor.withOpacity(0.5));
-    for (final o in e.obs) _emoji(cv, config.obstacleEmoji, o.x, o.y, o.r * size.width * 1.7, size);
-    for (final c in e.cols) _emoji(cv, config.collectEmoji, c.x, c.y, c.r * size.width * 1.6, size);
+        Paint()..color = config.primaryColor.withValues(alpha: 0.5));
+    for (final o in e.obs) {
+      _emoji(cv, config.obstacleEmoji, o.x, o.y, o.r * size.width * 1.7, size);
+    }
+    for (final c in e.cols) {
+      _emoji(cv, config.collectEmoji, c.x, c.y, c.r * size.width * 1.6, size);
+    }
     _player(cv, e, size, 0.3, e.py, e.pr);
   }
 
@@ -335,13 +350,16 @@ class _ArcadePainter extends CustomPainter {
       for (int i = 0; i < 12; i++) {
         tvy += 1.1 * 0.05; tx += tvx * 0.05; ty += tvy * 0.05;
         cv.drawCircle(Offset(tx * size.width, ty * size.height), 3,
-            Paint()..color = Colors.white.withOpacity(0.6));
+            Paint()..color = Colors.white.withValues(alpha: 0.6));
       }
     }
     for (final m in e.misc) {
-      if (m.kind == 4) _emoji(cv, config.obstacleEmoji, m.x, m.y, m.r * size.width * 1.7, size);
-      else if (m.kind == 7) cv.drawCircle(Offset(m.x * size.width, m.y * size.height),
-          m.r * size.width, Paint()..color = config.accentColor);
+      if (m.kind == 4) {
+        _emoji(cv, config.obstacleEmoji, m.x, m.y, m.r * size.width * 1.7, size);
+      } else if (m.kind == 7) {
+        cv.drawCircle(Offset(m.x * size.width, m.y * size.height),
+            m.r * size.width, Paint()..color = config.accentColor);
+      }
     }
     _player(cv, e, size, 0.15, 0.85, e.pr * 0.8);
   }
@@ -356,13 +374,13 @@ class _ArcadePainter extends CustomPainter {
       cv.drawRRect(RRect.fromRectAndRadius(
           Rect.fromCenter(center: Offset(e.towerX * size.width, y), width: wob, height: bh - 3),
           const Radius.circular(4)),
-          Paint()..color = i.isEven ? config.primaryColor : config.accentColor.withOpacity(0.85));
+          Paint()..color = i.isEven ? config.primaryColor : config.accentColor.withValues(alpha: 0.85));
     }
     final by = e.dropping ? e.dropY : 0.15;
     cv.drawRRect(RRect.fromRectAndRadius(
         Rect.fromCenter(center: Offset(e.stackX * size.width, by * size.height),
             width: bw, height: bh - 3), const Radius.circular(4)),
-        Paint()..color = Colors.white.withOpacity(0.9));
+        Paint()..color = Colors.white.withValues(alpha: 0.9));
     _emoji(cv, config.bgEmoji, 0.5, 0.96, 40, size);
   }
 
@@ -376,7 +394,9 @@ class _ArcadePainter extends CustomPainter {
       cv.drawRect(Rect.fromLTWH(x - w / 2, gapB, w, size.height - gapB), wp);
       _emoji(cv, config.obstacleEmoji, o.x, o.y - o.a / 2 - 0.04, 30, size);
     }
-    for (final c in e.cols) _emoji(cv, config.collectEmoji, c.x, c.y, c.r * size.width * 1.6, size);
+    for (final c in e.cols) {
+      _emoji(cv, config.collectEmoji, c.x, c.y, c.r * size.width * 1.6, size);
+    }
     _player(cv, e, size, 0.3, e.py, e.pr);
   }
 
@@ -402,7 +422,7 @@ class _ArcadePainter extends CustomPainter {
     cv.drawCircle(Offset(e.bx * size.width, e.by * size.height), 0.03 * size.width,
         Paint()..color = Colors.white);
     cv.drawCircle(Offset(e.bx * size.width - 4, e.by * size.height - 4), 0.01 * size.width,
-        Paint()..color = Colors.white.withOpacity(0.8));
+        Paint()..color = Colors.white.withValues(alpha: 0.8));
   }
 
   void _paintMaze(Canvas cv, Size size) {
@@ -411,7 +431,7 @@ class _ArcadePainter extends CustomPainter {
     final n = e.mazeN, m = e.mazeM;
     final cw = size.width / n, ch = (size.height * 0.92) / m;
     final y0 = size.height * 0.04;
-    final wallP = Paint()..color = config.primaryColor.withOpacity(0.85);
+    final wallP = Paint()..color = config.primaryColor.withValues(alpha: 0.85);
     for (int gy = 0; gy < m; gy++) {
       for (int gx = 0; gx < n; gx++) {
         if (e.maze[gy][gx] == 1) {
@@ -420,7 +440,9 @@ class _ArcadePainter extends CustomPainter {
       }
     }
     _emoji(cv, '🏁', e.goalX, e.goalY, 40, size);
-    for (final c in e.cols) _emoji(cv, config.collectEmoji, c.x, c.y, c.r * size.width * 1.6, size);
+    for (final c in e.cols) {
+      _emoji(cv, config.collectEmoji, c.x, c.y, c.r * size.width * 1.6, size);
+    }
     _player(cv, e, size, e.px, e.py, e.pr * 0.9);
   }
 
@@ -436,7 +458,9 @@ class _ArcadePainter extends CustomPainter {
       cv.drawArc(Rect.fromCircle(center: Offset(cx, cy), radius: rr),
           gapC + 0.28, 6.2832 - 0.56, false, p);
     }
-    for (final c in e.cols) _emoji(cv, config.collectEmoji, c.x, c.y, c.r * size.width * 1.6, size);
+    for (final c in e.cols) {
+      _emoji(cv, config.collectEmoji, c.x, c.y, c.r * size.width * 1.6, size);
+    }
     _player(cv, e, size, e.px, e.py, e.pr);
   }
 
@@ -445,7 +469,7 @@ class _ArcadePainter extends CustomPainter {
     for (int lane = 0; lane < 3; lane++) {
       final x = (0.2 + lane * 0.3) * size.width;
       cv.drawLine(Offset(x, 0), Offset(x, size.height),
-          Paint()..color = Colors.white.withOpacity(0.12)..strokeWidth = 4);
+          Paint()..color = Colors.white.withValues(alpha: 0.12)..strokeWidth = 4);
     }
     cv.drawLine(Offset(0, 0.8 * size.height), Offset(size.width, 0.8 * size.height),
         Paint()..color = config.accentColor..strokeWidth = 5);

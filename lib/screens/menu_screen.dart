@@ -52,7 +52,7 @@ class _MenuScreenState extends State<MenuScreen> {
       body: Container(
         decoration: BoxDecoration(gradient: LinearGradient(
           begin: Alignment.topCenter, end: Alignment.bottomCenter,
-          colors: [c.darkColor, c.primaryColor.withOpacity(0.6)])),
+          colors: [c.darkColor, c.primaryColor.withValues(alpha: 0.6)])),
         child: SafeArea(child: Center(child: SingleChildScrollView(
           padding: const EdgeInsets.all(28),
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
